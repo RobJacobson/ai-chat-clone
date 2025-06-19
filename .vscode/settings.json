@@ -1,0 +1,56 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.expo": true,
+    ".vscode": true,
+    "node_modules": true,
+    ".gitignore": true,
+    "babel.config.js": true,
+    "bun.lock": true,
+    "expo-env.d.ts": true,
+    "metro.config.js": true,
+    "nativewind-env.d.ts": true
+  },
+  "hide-files.files": [
+    ".vscode",
+    "node_modules",
+    ".gitignore",
+    "babel.config.js",
+    "bun.lock",
+    "expo-env.d.ts",
+    "metro.config.js",
+    "nativewind-env.d.ts",
+    "app.json"
+  ],
+  // Biome formatter configuration
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "explicit",
+    "quickfix.biome": "explicit"
+  },
+  "editor.defaultFormatter": "biomejs.biome",
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
+}
