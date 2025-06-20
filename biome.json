@@ -75,7 +75,7 @@
       "correctness": {
         "recommended": true,
         "noUnusedVariables": "warn",
-        "noUnusedImports": "warn",
+        "noUnusedImports": "off",
         "useExhaustiveDependencies": "warn"
       },
       "nursery": {

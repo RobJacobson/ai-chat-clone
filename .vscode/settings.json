@@ -14,7 +14,9 @@
     "bun.lock": true,
     "expo-env.d.ts": true,
     "metro.config.js": true,
-    "nativewind-env.d.ts": true
+    "nativewind-env.d.ts": true,
+    "app.json": true,
+    "index.js": true
   },
   "hide-files.files": [
     ".vscode",
@@ -25,15 +27,18 @@
     "expo-env.d.ts",
     "metro.config.js",
     "nativewind-env.d.ts",
-    "app.json"
+    "app.json",
+    "index.js"
   ],
   // Biome formatter configuration
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "editor.codeActionsOnSave": {
-    "source.organizeImports.biome": "explicit",
-    "source.fixAll.biome": "explicit"
+    "quickfix.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
   },
+  "biome.lspBin": "npx @biomejs/biome",
+  "biome.requireConfigFile": true,
   "editor.defaultFormatter": "biomejs.biome",
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
