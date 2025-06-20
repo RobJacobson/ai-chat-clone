@@ -14,6 +14,7 @@ import * as React from "react";
 import { Appearance, Platform, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import HistoryChatsDrawer from "~/components/HistoryChatsDrawer";
 import { ThemeToggle } from "~/components/ThemeToggle";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { NAV_THEME } from "~/lib/constants";
@@ -48,6 +49,7 @@ export default function RootLayout() {
       <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Drawer
+          drawerContent={HistoryChatsDrawer}
           screenOptions={{
             headerTitle: "",
             headerStyle: { backgroundColor: "black" },
@@ -65,6 +67,12 @@ export default function RootLayout() {
               drawerIcon: () => (
                 <FontAwesome5 name="robot" color={"white"} size={20} />
               ),
+            }}
+          />
+          <Drawer.Screen
+            name="chat/[id]"
+            options={{
+              drawerItemStyle: { display: "none" },
             }}
           />
         </Drawer>
