@@ -7,10 +7,11 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
-import { Stack } from "expo-router";
+import { Drawer } from "expo-router/drawer";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
-import { Appearance, Platform } from "react-native";
+import { Appearance, Platform, StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { ThemeToggle } from "~/components/ThemeToggle";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
@@ -44,19 +45,33 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
       <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-      <Stack>
-        <Stack.Screen
-          name="index"
-          options={{
-            title: "Starter Base",
-            headerRight: () => <ThemeToggle />,
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Drawer
+          screenOptions={{
+            headerTitle: "",
+            headerStyle: { backgroundColor: "black" },
+            drawerInactiveTintColor: "white",
+            drawerStyle: {
+              borderRightColor: "grey",
+              borderWidth: StyleSheet.hairlineWidth,
+            },
           }}
         />
-      </Stack>
+      </GestureHandlerRootView>
       <PortalHost />
     </ThemeProvider>
   );
 }
+
+// <Stack>
+//   <Stack.Screen
+//     name="index"
+//     options={{
+//       title: "Starter Base",
+//       headerRight: () => <ThemeToggle />,
+//     }}
+//   />
+// </Stack>;
 
 const useIsomorphicLayoutEffect =
   Platform.OS === "web" && typeof window === "undefined"
