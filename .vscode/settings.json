@@ -32,7 +32,7 @@
   "editor.formatOnSaveMode": "file",
   "editor.codeActionsOnSave": {
     "source.organizeImports.biome": "explicit",
-    "quickfix.biome": "explicit"
+    "source.fixAll.biome": "explicit"
   },
   "editor.defaultFormatter": "biomejs.biome",
   "[javascript]": {

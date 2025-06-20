@@ -35,7 +35,31 @@
     "attributePosition": "auto",
     "bracketSpacing": true
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              ":URL:",
+              ":BLANK_LINE:",
+              ":PACKAGE_WITH_PROTOCOL:",
+              ":BLANK_LINE:",
+              ":NODE:",
+              ":BUN:",
+              ":BLANK_LINE:",
+              ":PACKAGE:",
+              ":BLANK_LINE:",
+              ":ALIAS:",
+              ":BLANK_LINE:",
+              ":PATH:"
+            ]
+          }
+        }
+      }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
@@ -94,7 +118,7 @@
       "semicolons": "always",
       "arrowParentheses": "always",
       "bracketSameLine": false,
-      "quoteStyle": "single"
+      "quoteStyle": "double"
     }
   },
   "json": {
