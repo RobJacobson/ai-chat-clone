@@ -1,5 +1,6 @@
 import "../global.css";
 
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import {
   DarkTheme,
   DefaultTheme,
@@ -56,7 +57,17 @@ export default function RootLayout() {
               borderWidth: StyleSheet.hairlineWidth,
             },
           }}
-        />
+        >
+          <Drawer.Screen
+            name="index"
+            options={{
+              drawerLabel: "ChatGPT",
+              drawerIcon: () => (
+                <FontAwesome5 name="robot" color={"white"} size={20} />
+              ),
+            }}
+          />
+        </Drawer>
       </GestureHandlerRootView>
       <PortalHost />
     </ThemeProvider>
