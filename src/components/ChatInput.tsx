@@ -14,10 +14,28 @@ import { useThemeColors } from "~/lib/useThemeColors";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 
-const ChatInput = () => {
+const ChatInput = ({
+  onSend,
+  isLoading,
+}: {
+  onSend: (message: string) => Promise<void>;
+  isLoading: boolean;
+}) => {
   const insets = useSafeAreaInsets();
   const [message, setMessage] = useState("");
   const colors = useThemeColors();
+
+  const handleSend = async () => {
+    if (!message.trim()) return;
+
+    const messageToSend = message;
+    setMessage("");
+    try {
+      await onSend(messageToSend);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -49,6 +67,7 @@ const ChatInput = () => {
               size={30}
               color={colors.foreground}
               className=""
+              onPress={handleSend}
             />
           ) : (
             <Button className="flex flex-row gap-2 rounded-full" size="sm">
