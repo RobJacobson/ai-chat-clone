@@ -1,12 +1,16 @@
 import { StatusBar } from "expo-status-bar";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+
+import ChatInput from "@/components/ChatInput";
+import { Text } from "@/components/ui/text";
 
 const HomeScreen = () => {
   return (
-    <View className="flex-1 items-center justify-center bg-white text-black dark:bg-black dark:text-white ">
-      <Text className="font-bold text-3xl text-black dark:text-white">
-        Home
-      </Text>
+    <View className="w-full flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center">
+        <Text className="mb-4 font-bold text-3xl">AI Chat Clone</Text>
+      </View>
+      <ChatInput />
       <StatusBar style="auto" />
     </View>
   );

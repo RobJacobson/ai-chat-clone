@@ -79,7 +79,10 @@
         "useExhaustiveDependencies": "warn"
       },
       "nursery": {
-        "useSortedClasses": "error"
+        "useSortedClasses": {
+          "level": "error",
+          "fix": "safe"
+        }
       },
       "performance": {
         "recommended": true

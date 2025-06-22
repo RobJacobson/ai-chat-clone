@@ -35,10 +35,11 @@
   "editor.formatOnSaveMode": "file",
   "editor.codeActionsOnSave": {
     "quickfix.biome": "explicit",
-    "source.organizeImports.biome": "explicit"
+    "source.organizeImports.biome": "explicit",
+    "source.fixAll.biome": "explicit"
   },
-  "biome.lspBin": "npx @biomejs/biome",
-  "biome.requireConfigFile": true,
+  "biome.lsp.bin": "npx @biomejs/biome",
+  "biome.requireConfiguration": true,
   "editor.defaultFormatter": "biomejs.biome",
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
@@ -57,5 +58,18 @@
   },
   "[css]": {
     "editor.defaultFormatter": "biomejs.biome"
+  },
+  "piny.project_settings": {
+    "open-pages": ["pinyfakepage.html"],
+    "urls": {
+      "pinyfakepage.html": {
+        "open-page-views": [
+          {
+            "w": 768,
+            "h": 0
+          }
+        ]
+      }
+    }
   }
 }

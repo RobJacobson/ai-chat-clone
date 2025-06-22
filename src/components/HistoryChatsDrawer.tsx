@@ -16,7 +16,7 @@ const HistoryChatsDrawer = (props: DrawerContentComponentProps) => {
         <DrawerItem
           key={chat.id}
           label={chat.title}
-          inactiveTintColor="white"
+          inactiveTintColor="gray"
           focused={pathname === `/chat/${chat.id}`}
           onPress={() => router.push(`/chat/${chat.id}`)}
         />

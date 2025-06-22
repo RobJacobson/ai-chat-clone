@@ -52,10 +52,20 @@ export default function RootLayout() {
           drawerContent={HistoryChatsDrawer}
           screenOptions={{
             headerTitle: "",
-            headerStyle: { backgroundColor: "black" },
-            drawerInactiveTintColor: "white",
+            headerStyle: {
+              backgroundColor: isDarkColorScheme
+                ? NAV_THEME.dark.background
+                : NAV_THEME.light.background,
+            },
+            headerRight: () => <ThemeToggle />,
+            drawerInactiveTintColor: isDarkColorScheme ? "white" : "black",
             drawerStyle: {
-              borderRightColor: "grey",
+              backgroundColor: isDarkColorScheme
+                ? NAV_THEME.dark.card
+                : NAV_THEME.light.card,
+              borderRightColor: isDarkColorScheme
+                ? NAV_THEME.dark.border
+                : NAV_THEME.light.border,
               borderWidth: StyleSheet.hairlineWidth,
             },
           }}
@@ -107,6 +117,15 @@ function useSetWebBackgroundClassName() {
 function useSetAndroidNavigationBar() {
   React.useLayoutEffect(() => {
     setAndroidNavigationBar(Appearance.getColorScheme() ?? "light");
+  }, []);
+
+  // Listen for appearance changes
+  React.useEffect(() => {
+    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+      setAndroidNavigationBar(colorScheme ?? "light");
+    });
+
+    return () => subscription?.remove();
   }, []);
 }
 
