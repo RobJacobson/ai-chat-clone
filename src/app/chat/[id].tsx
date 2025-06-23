@@ -1,9 +1,13 @@
 import chatHistory from "@assets/data/chatHistory.json";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 
 import ChatInput from "~/components/ChatInput";
+import type { MessageType } from "~/components/MessageListItem";
+import MessageListItem from "~/components/MessageListItem";
+import { Text } from "~/components/ui/text";
 
 const ChatScreen = () => {
   const { id } = useLocalSearchParams();
@@ -17,14 +21,18 @@ const ChatScreen = () => {
   if (!chat) {
     return (
       <View>
-        r<Text>Chat {id} not found</Text>
+        <Text>Chat {id} not found</Text>
       </View>
     );
   }
 
   return (
     <View className="flex-1">
-      <Text className="flex-1 text-white">Chat Screen {id}</Text>
+      <FlatList
+        data={chat.messages as Array<MessageType>}
+        renderItem={({ item }) => <MessageListItem messageItem={item} />}
+        keyExtractor={(item) => item.id}
+      />
       <ChatInput onSend={handleSend} isLoading={isLoading} />
     </View>
   );
