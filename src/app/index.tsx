@@ -1,15 +1,21 @@
+import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { View } from "react-native";
 
 import ChatInput from "@/components/ChatInput";
 import { Text } from "@/components/ui/text";
+import { useChatStore } from "~/store/chatStore";
 
 const HomeScreen = () => {
+  const createNewChat = useChatStore((state) => state.createNewChat);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async (message: string) => {
     console.log("Sending message:", message);
+    const newChatId = createNewChat(message.slice(0, 50));
+    router.push(`/chat/${newChatId}`);
   };
 
   return (

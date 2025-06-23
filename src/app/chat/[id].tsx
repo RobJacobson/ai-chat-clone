@@ -1,17 +1,17 @@
-import chatHistory from "@assets/data/chatHistory.json";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 
 import ChatInput from "~/components/ChatInput";
-import MessageListItem from "~/components/MessageListItem";
+import MessageList from "~/components/MessageList";
 import { Text } from "~/components/ui/text";
-import type { Message } from "~/types/types";
+import { useChatStore } from "~/store/chatStore";
 
 const ChatScreen = () => {
   const { id } = useLocalSearchParams();
-  const chat = chatHistory.find((chat) => chat.id === id);
+  const chat = useChatStore((state) => state.chatHistory).find(
+    (chat) => chat.id === id
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async (message: string) => {
@@ -28,11 +28,7 @@ const ChatScreen = () => {
 
   return (
     <View className="flex-1">
-      <FlatList
-        data={chat.messages as Array<Message>}
-        renderItem={({ item }) => <MessageListItem messageItem={item} />}
-        keyExtractor={(item) => item.id}
-      />
+      <MessageList messages={chat.messages} />
       <ChatInput onSend={handleSend} isLoading={isLoading} />
     </View>
   );
