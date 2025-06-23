@@ -1,5 +1,41 @@
 [
   {
+    "id": "0",
+    "title": "React Native Hook Tutorial",
+    "messages": [
+      {
+        "id": "0-1",
+        "role": "user",
+        "message": "How do I create a custom hook for theme colors in React Native?"
+      },
+      {
+        "id": "0-2",
+        "role": "assistant",
+        "message": "Here's how to create a **custom theme hook**:\n\n```tsx\nimport { useColorScheme } from 'nativewind';\n\nexport const useThemeColors = () => {\n  const { isDarkColorScheme } = useColorScheme();\n  \n  return {\n    primary: isDarkColorScheme ? '#ffffff' : '#000000',\n    secondary: isDarkColorScheme ? '#333333' : '#f0f0f0',\n  };\n};\n```\n\n**Key benefits:**\n- ✅ Reusable across components\n- ✅ Automatic theme switching\n- ✅ Type-safe color definitions"
+      },
+      {
+        "id": "0-3",
+        "role": "user",
+        "message": "Can you show me how to use it in a component?"
+      },
+      {
+        "id": "0-4",
+        "role": "assistant",
+        "message": "Absolutely! Here's a practical example:\n\n```tsx\nimport { MaterialCommunityIcons } from '@expo/vector-icons';\nimport { useThemeColors } from '~/lib/useThemeColors';\n\nconst MyComponent = () => {\n  const colors = useThemeColors();\n  \n  return (\n    <View>\n      <MaterialCommunityIcons \n        name=\"heart\" \n        color={colors.primary} \n        size={24} \n      />\n      <Text style={{ color: colors.secondary }}>\n        Themed text!\n      </Text>\n    </View>\n  );\n};\n```\n\n> **Pro tip:** This automatically adapts to light/dark mode changes!"
+      },
+      {
+        "id": "0-5",
+        "role": "user",
+        "message": "What about TypeScript types?"
+      },
+      {
+        "id": "0-6",
+        "role": "assistant",
+        "message": "Great question! Here's the **type-safe version**:\n\n```tsx\ntype ThemeColors = {\n  primary: string;\n  secondary: string;\n  accent: string;\n  background: string;\n};\n\nexport const useThemeColors = (): ThemeColors => {\n  const { isDarkColorScheme } = useColorScheme();\n  \n  return {\n    primary: isDarkColorScheme \n      ? 'hsl(0 0% 98%)' \n      : 'hsl(240 10% 3.9%)',\n    secondary: isDarkColorScheme \n      ? 'hsl(240 3.7% 15.9%)' \n      : 'hsl(240 4.8% 95.9%)',\n    accent: isDarkColorScheme \n      ? 'hsl(0 0% 98%)' \n      : 'hsl(240 5.9% 10%)',\n    background: isDarkColorScheme \n      ? 'hsl(240 10% 3.9%)' \n      : 'hsl(0 0% 100%)',\n  } as const;\n};\n```\n\n**Benefits:**\n- 🎯 Full IntelliSense support\n- 🛡️ Compile-time error checking\n- 📚 Self-documenting code"
+      }
+    ]
+  },
+  {
     "id": "1",
     "title": "Creating Resume",
     "messages": [
@@ -90,7 +126,7 @@
       {
         "id": "4-3",
         "role": "user",
-        "message": "What’s a good opening scene?"
+        "message": "What's a good opening scene?"
       },
       {
         "id": "4-4",
@@ -106,7 +142,7 @@
       {
         "id": "5-1",
         "role": "user",
-        "message": "My app’s UI feels cluttered. Any tips?"
+        "message": "My app's UI feels cluttered. Any tips?"
       },
       {
         "id": "5-2",
@@ -138,7 +174,7 @@
       {
         "id": "6-3",
         "role": "user",
-        "message": "I’m 30, male, 180 lbs, 5’10”, moderately active."
+        "message": "I'm 30, male, 180 lbs, 5'10\", moderately active."
       },
       {
         "id": "6-4",
