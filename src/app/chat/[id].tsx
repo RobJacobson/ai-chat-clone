@@ -13,9 +13,16 @@ const ChatScreen = () => {
     (chat) => chat.id === id
   );
   const [isLoading, setIsLoading] = useState(false);
+  const { addNewMessage } = useChatStore((state) => state);
 
   const handleSend = async (message: string) => {
+    if (!chat) return;
     console.log("Sending message:", message);
+    addNewMessage(chat.id, {
+      id: Date.now().toString(),
+      role: "user",
+      message,
+    });
   };
 
   if (!chat) {

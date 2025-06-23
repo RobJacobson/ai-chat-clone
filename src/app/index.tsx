@@ -8,13 +8,18 @@ import { Text } from "@/components/ui/text";
 import { useChatStore } from "~/store/chatStore";
 
 const HomeScreen = () => {
-  const createNewChat = useChatStore((state) => state.createNewChat);
+  const { createNewChat, addNewMessage } = useChatStore((state) => state);
 
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async (message: string) => {
     console.log("Sending message:", message);
     const newChatId = createNewChat(message.slice(0, 50));
+    addNewMessage(newChatId, {
+      id: Date.now().toString(),
+      role: "user",
+      message,
+    });
     router.push(`/chat/${newChatId}`);
   };
 
