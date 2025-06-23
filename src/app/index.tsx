@@ -15,12 +15,24 @@ const HomeScreen = () => {
   const handleSend = async (message: string) => {
     console.log("Sending message:", message);
     const newChatId = createNewChat(message.slice(0, 50));
-    addNewMessage(newChatId, {
+
+    const newMessage = {
       id: Date.now().toString(),
       role: "user",
       message,
-    });
+    } as const;
+    addNewMessage(newChatId, newMessage);
     router.push(`/chat/${newChatId}`);
+
+    try {
+      console.log("Fetching data");
+      const response = await fetch("/api/chat");
+      const data = await response.json();
+
+      console.log(data);
+    } catch (error) {
+      console.error("Chat error:", error);
+    }
   };
 
   return (

@@ -15,7 +15,6 @@
     "expo-env.d.ts": true,
     "metro.config.js": true,
     "nativewind-env.d.ts": true,
-    "app.json": true,
     "index.js": true,
     "tsconfig.json": true
   },
@@ -28,7 +27,6 @@
     "expo-env.d.ts",
     "metro.config.js",
     "nativewind-env.d.ts",
-    "app.json",
     "index.js",
     "tsconfig.json"
   ],
