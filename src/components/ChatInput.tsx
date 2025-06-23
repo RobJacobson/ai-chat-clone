@@ -12,7 +12,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useThemeColors } from "~/lib/useThemeColors";
 
 import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
 
 const ChatInput = ({
   onSend,

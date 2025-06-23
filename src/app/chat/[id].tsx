@@ -5,9 +5,9 @@ import { View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
 import ChatInput from "~/components/ChatInput";
-import type { MessageType } from "~/components/MessageListItem";
 import MessageListItem from "~/components/MessageListItem";
 import { Text } from "~/components/ui/text";
+import type { Message } from "~/types/types";
 
 const ChatScreen = () => {
   const { id } = useLocalSearchParams();
@@ -29,7 +29,7 @@ const ChatScreen = () => {
   return (
     <View className="flex-1">
       <FlatList
-        data={chat.messages as Array<MessageType>}
+        data={chat.messages as Array<Message>}
         renderItem={({ item }) => <MessageListItem messageItem={item} />}
         keyExtractor={(item) => item.id}
       />

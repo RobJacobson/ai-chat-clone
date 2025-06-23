@@ -16,7 +16,8 @@
     "metro.config.js": true,
     "nativewind-env.d.ts": true,
     "app.json": true,
-    "index.js": true
+    "index.js": true,
+    "tsconfig.json": true
   },
   "hide-files.files": [
     ".vscode",
@@ -28,7 +29,8 @@
     "metro.config.js",
     "nativewind-env.d.ts",
     "app.json",
-    "index.js"
+    "index.js",
+    "tsconfig.json"
   ],
   // Biome formatter configuration
   "editor.formatOnSave": true,
