@@ -1,8 +1,8 @@
-import { useThemeColors } from "./useThemeColors";
+import { useTheme } from "./useTheme";
 
 // Define markdown styles based on current theme
 export const useMarkdownStyles = () => {
-  const colors = useThemeColors();
+  const { colors } = useTheme();
 
   const markdownStyles = {
     body: {

@@ -3,7 +3,7 @@ import Markdown from "react-native-markdown-display";
 
 import { useMarkdownStyles } from "~/hooks/useMarkdownStyles";
 import { cn } from "~/lib/utils";
-import type { Message } from "~/types/types";
+import type { Message } from "~/store/chatStore";
 
 const MessageListItem = ({ messageItem }: { messageItem: Message }) => {
   const { message, role } = messageItem;
