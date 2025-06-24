@@ -1,4 +1,4 @@
-import { useColorScheme } from "~/lib/useColorScheme";
+import { useColorScheme } from "./useColorScheme";
 
 export const useThemeColors = () => {
   const { isDarkColorScheme } = useColorScheme();

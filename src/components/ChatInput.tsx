@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useThemeColors } from "~/lib/useThemeColors";
+import { useThemeColors } from "~/hooks/useThemeColors";
 
 import { Button } from "./ui/button";
 

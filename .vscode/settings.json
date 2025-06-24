@@ -9,7 +9,6 @@
     "**/.expo": true,
     ".vscode": true,
     "node_modules": true,
-    ".gitignore": true,
     "babel.config.js": true,
     "bun.lock": true,
     "expo-env.d.ts": true,
@@ -21,7 +20,6 @@
   "hide-files.files": [
     ".vscode",
     "node_modules",
-    ".gitignore",
     "babel.config.js",
     "bun.lock",
     "expo-env.d.ts",

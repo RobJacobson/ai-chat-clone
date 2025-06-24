@@ -7,7 +7,7 @@ import type { Chat, Message } from "~/types/types";
 type ChatStore = {
   chatHistory: Chat[];
   createNewChat: (title: string) => string;
-  addNewMessage: (chatId: string, message: Message) => void;
+  addNewMessage: (chatId: string, message: Omit<Message, "id">) => void;
 };
 
 export const useChatStore = create<ChatStore>()(
@@ -15,10 +15,10 @@ export const useChatStore = create<ChatStore>()(
     (set) => ({
       chatHistory: [],
 
-      createNewChat: (title: string) => {
+      createNewChat: (message: string) => {
         const newChat: Chat = {
           id: Date.now().toString(),
-          title,
+          title: message.slice(0, 50),
           messages: [],
         };
 
@@ -27,11 +27,16 @@ export const useChatStore = create<ChatStore>()(
         return newChat.id;
       },
 
-      addNewMessage: (chatId, message) => {
+      addNewMessage: (chatId, messageWithoutId) => {
+        const messageWithId: Message = {
+          ...messageWithoutId,
+          id: Date.now().toString(),
+        };
+
         set((state) => ({
           chatHistory: state.chatHistory.map((chat) =>
             chat.id === chatId
-              ? { ...chat, messages: [...(chat.messages ?? []), message] }
+              ? { ...chat, messages: [...(chat.messages ?? []), messageWithId] }
               : chat
           ),
         }));

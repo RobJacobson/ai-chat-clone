@@ -1,10 +1,10 @@
 import { useLocalSearchParams } from "expo-router";
-import { useState } from "react";
 import { View } from "react-native";
 
 import ChatInput from "~/components/ChatInput";
 import MessageList from "~/components/MessageList";
 import { Text } from "~/components/ui/text";
+import { useChatAPI } from "~/hooks/useChatAPI";
 import { useChatStore } from "~/store/chatStore";
 
 const ChatScreen = () => {
@@ -12,23 +12,19 @@ const ChatScreen = () => {
   const chat = useChatStore((state) => state.chatHistory).find(
     (chat) => chat.id === id
   );
-  const [isLoading, setIsLoading] = useState(false);
-  const { addNewMessage } = useChatStore((state) => state);
+  const { sendMessage, isLoading } = useChatAPI();
 
   const handleSend = async (message: string) => {
     if (!chat) return;
-    console.log("Sending message:", message);
-    addNewMessage(chat.id, {
-      id: Date.now().toString(),
-      role: "user",
-      message,
-    });
+
+    const previousResponseId = chat.messages.at(-1)?.responseId;
+    await sendMessage(chat.id, message, previousResponseId);
   };
 
   if (!chat) {
     return (
-      <View>
-        <Text>Chat {id} not found</Text>
+      <View className="flex-1 items-center justify-center">
+        <Text>Chat not found</Text>
       </View>
     );
   }

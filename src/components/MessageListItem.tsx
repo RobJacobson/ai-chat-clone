@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import Markdown from "react-native-markdown-display";
 
-import { useMarkdownStyles } from "~/lib/useMarkdownStyles";
+import { useMarkdownStyles } from "~/hooks/useMarkdownStyles";
 import { cn } from "~/lib/utils";
 import type { Message } from "~/types/types";
 

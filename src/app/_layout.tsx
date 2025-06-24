@@ -16,9 +16,9 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import HistoryChatsDrawer from "~/components/HistoryChatsDrawer";
 import { ThemeToggle } from "~/components/ThemeToggle";
+import { useColorScheme } from "~/hooks/useColorScheme";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { NAV_THEME } from "~/lib/constants";
-import { useColorScheme } from "~/lib/useColorScheme";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
