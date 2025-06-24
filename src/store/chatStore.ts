@@ -2,23 +2,27 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type Message = {
+export type MessageType = {
   id: string;
   role: "user" | "assistant";
   message: string;
+  image?: string;
   responseId?: string;
 };
 
 export type Chat = {
   id: string;
   title: string;
-  messages: Message[];
+  messages: MessageType[];
 };
 
 type ChatStore = {
   chatHistory: Chat[];
   createNewChat: (title: string) => string;
-  addNewMessage: (chatId: string, message: Omit<Message, "id">) => void;
+  addNewMessage: (
+    chatId: string,
+    message: Omit<MessageType, "id">
+  ) => MessageType;
 };
 
 export const useChatStore = create<ChatStore>()(
@@ -39,7 +43,7 @@ export const useChatStore = create<ChatStore>()(
       },
 
       addNewMessage: (chatId, messageWithoutId) => {
-        const messageWithId: Message = {
+        const messageWithId: MessageType = {
           ...messageWithoutId,
           id: Date.now().toString(),
         };
@@ -51,6 +55,8 @@ export const useChatStore = create<ChatStore>()(
               : chat
           ),
         }));
+
+        return messageWithId;
       },
     }),
     {

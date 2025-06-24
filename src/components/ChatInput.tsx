@@ -1,6 +1,9 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
+  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -9,30 +12,68 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useChatAPI } from "~/hooks/useChatAPI";
 import { useTheme } from "~/hooks/useTheme";
+import { useChatStore } from "~/store/chatStore";
 
 import { Button } from "./ui/button";
 
-const ChatInput = ({
-  onSend,
-  isLoading,
-}: {
-  onSend: (message: string) => Promise<void>;
-  isLoading: boolean;
-}) => {
+const ChatInput = ({ chatId }: { chatId: string | null }) => {
   const insets = useSafeAreaInsets();
   const [message, setMessage] = useState("");
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const { colors } = useTheme();
+
+  // Optimized selectors - only re-render when these specific values change
+  const addNewMessage = useChatStore((state) => state.addNewMessage);
+  const createNewChat = useChatStore((state) => state.createNewChat);
+  const chatHistory = useChatStore((state) => state.chatHistory);
+
+  const { sendUserMessage } = useChatAPI();
 
   const handleSend = async () => {
     if (!message.trim()) return;
 
-    const messageToSend = message;
-    setMessage("");
     try {
-      await onSend(messageToSend);
+      const currentChatId = !chatId ? createNewChat(message) : chatId;
+
+      // Add user message to state immediately
+      const userMessage = addNewMessage(currentChatId, {
+        role: "user",
+        message,
+        ...(imageBase64 && { image: imageBase64 }),
+      });
+
+      // Clear input immediately
+      setMessage("");
+      setImageBase64(null);
+
+      // Navigate to chat if it's a new chat
+      if (!chatId) {
+        router.push(`/chat/${currentChatId}`);
+      }
+
+      // Get previous response ID for context
+      const chat = chatHistory.find((chat) => chat.id === currentChatId);
+      const previousResponse = chat?.messages.at(-1);
+      const previousResponseId = previousResponse?.responseId ?? null;
+
+      // Send message to API (this will also add the AI response to state)
+      await sendUserMessage(currentChatId, userMessage, previousResponseId);
     } catch (error) {
-      console.log(error);
+      console.log("Error sending message:", error);
+    }
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      base64: true,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets[0].base64) {
+      setImageBase64(`data:image/jpeg;base64,${result.assets[0].base64}`);
     }
   };
 
@@ -46,6 +87,21 @@ const ChatInput = ({
         className="m-0 w-full rounded-t-3xl bg-muted"
         style={{ paddingBottom: insets.bottom }}
       >
+        {imageBase64 && (
+          <ImageBackground
+            source={{ uri: imageBase64 }}
+            className="mx-3 mt-2 h-16 w-16"
+            imageClassName="rounded-xl;"
+          >
+            <AntDesign
+              name="closecircle"
+              size={24}
+              color={colors.foreground}
+              onPress={() => setImageBase64(null)}
+              className="absolute top-0 right-0"
+            />
+          </ImageBackground>
+        )}
         <TextInput
           value={message}
           onChangeText={setMessage}
@@ -59,6 +115,7 @@ const ChatInput = ({
             name="plus"
             size={24}
             color={colors.foreground}
+            onPress={pickImage}
           />
           {message ? (
             <MaterialCommunityIcons

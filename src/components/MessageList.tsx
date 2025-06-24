@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 import { FlatList } from "react-native-gesture-handler";
 
-import type { Message } from "~/store/chatStore";
+import type { MessageType } from "~/store/chatStore";
 
 import MessageListItem from "./MessageListItem";
 
 interface MessageListProps {
-  messages: Message[];
+  messages: MessageType[];
 }
 
 const MessageList = ({ messages }: MessageListProps) => {
@@ -14,12 +14,11 @@ const MessageList = ({ messages }: MessageListProps) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      console.log("scrolling to end");
       flatListRef.current?.scrollToEnd({ animated: true });
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [messages]);
+  }, [messages.length]);
 
   return (
     <FlatList

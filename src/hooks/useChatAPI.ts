@@ -1,57 +1,52 @@
 import { useState } from "react";
 
-import { useChatStore } from "~/store/chatStore";
+import { type MessageType, useChatStore } from "~/store/chatStore";
 
 export const useChatAPI = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { addNewMessage } = useChatStore((state) => state);
+  const addNewMessage = useChatStore((state) => state.addNewMessage);
 
-  const sendMessage = async (
+  const sendUserMessage = async (
     chatId: string,
-    message: string,
-    previousResponseId?: string
+    messageData: MessageType,
+    previousResponseId?: string | null
   ) => {
     setIsLoading(true);
-
-    // Add user message
-    addNewMessage(chatId, {
-      role: "user",
-      message,
-    });
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message,
+          message: messageData.message,
+          image: messageData.image,
           previousResponseId,
         }),
       });
 
       const data = await response.json();
-
       console.log("data", data);
+
       if (!response.ok) {
         throw new Error(data.error);
       }
 
-      const aiResponseMessage = {
+      // Add AI response to state
+      addNewMessage(chatId, {
+        role: "assistant",
         message: data.responseMessage,
         responseId: data.responseId,
-        role: "assistant" as const,
-      };
-
-      addNewMessage(chatId, aiResponseMessage);
+      });
     } catch (error) {
       console.error("Chat error:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
   return {
-    sendMessage,
+    sendUserMessage,
     isLoading,
   };
 };
