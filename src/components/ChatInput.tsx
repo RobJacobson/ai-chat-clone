@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useThemeColors } from "~/hooks/useThemeColors";
+import { useTheme } from "~/hooks/useTheme";
 
 import { Button } from "./ui/button";
 
@@ -22,7 +22,7 @@ const ChatInput = ({
 }) => {
   const insets = useSafeAreaInsets();
   const [message, setMessage] = useState("");
-  const colors = useThemeColors();
+  const { colors } = useTheme();
 
   const handleSend = async () => {
     if (!message.trim()) return;

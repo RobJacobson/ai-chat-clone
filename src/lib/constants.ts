@@ -16,3 +16,22 @@ export const NAV_THEME = {
     text: "hsl(0 0% 98%)", // foreground
   },
 };
+
+export const THEME_COLORS = {
+  light: {
+    foreground: "hsl(240 10% 3.9%)",
+    primaryForeground: "hsl(0 0% 98%)",
+    muted: "hsl(240 4.8% 95.9%)",
+    mutedForeground: "hsl(240 3.8% 46.1%)",
+    accent: "hsl(240 4.8% 95.9%)",
+    accentForeground: "hsl(240 5.9% 10%)",
+  },
+  dark: {
+    foreground: "hsl(0 0% 98%)",
+    primaryForeground: "hsl(240 5.9% 10%)",
+    muted: "hsl(240 3.7% 15.9%)",
+    mutedForeground: "hsl(240 5% 64.9%)",
+    accent: "hsl(240 3.7% 15.9%)",
+    accentForeground: "hsl(0 0% 98%)",
+  },
+};

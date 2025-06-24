@@ -16,18 +16,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import HistoryChatsDrawer from "~/components/HistoryChatsDrawer";
 import { ThemeToggle } from "~/components/ThemeToggle";
-import { useColorScheme } from "~/hooks/useColorScheme";
+import { useTheme } from "~/hooks/useTheme";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
-import { NAV_THEME } from "~/lib/constants";
 
-const LIGHT_THEME: Theme = {
-  ...DefaultTheme,
-  colors: NAV_THEME.light,
-};
-const DARK_THEME: Theme = {
-  ...DarkTheme,
-  colors: NAV_THEME.dark,
-};
+// Theme objects will be created dynamically using the useTheme hook
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -42,10 +34,15 @@ const usePlatformSpecificSetup = Platform.select({
 
 export default function RootLayout() {
   usePlatformSpecificSetup();
-  const { isDarkColorScheme } = useColorScheme();
+  const { isDarkColorScheme, navigationTheme, colors } = useTheme();
+
+  const currentTheme: Theme = {
+    ...(isDarkColorScheme ? DarkTheme : DefaultTheme),
+    colors: navigationTheme.colors,
+  };
 
   return (
-    <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+    <ThemeProvider value={currentTheme}>
       <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Drawer
@@ -53,19 +50,13 @@ export default function RootLayout() {
           screenOptions={{
             headerTitle: "",
             headerStyle: {
-              backgroundColor: isDarkColorScheme
-                ? NAV_THEME.dark.background
-                : NAV_THEME.light.background,
+              backgroundColor: colors.navigation.background,
             },
             headerRight: () => <ThemeToggle />,
             drawerInactiveTintColor: isDarkColorScheme ? "white" : "black",
             drawerStyle: {
-              backgroundColor: isDarkColorScheme
-                ? NAV_THEME.dark.card
-                : NAV_THEME.light.card,
-              borderRightColor: isDarkColorScheme
-                ? NAV_THEME.dark.border
-                : NAV_THEME.light.border,
+              backgroundColor: colors.navigation.card,
+              borderRightColor: colors.navigation.border,
               borderWidth: StyleSheet.hairlineWidth,
             },
           }}
@@ -106,7 +97,6 @@ const useIsomorphicLayoutEffect =
   Platform.OS === "web" && typeof window === "undefined"
     ? React.useEffect
     : React.useLayoutEffect;
-
 function useSetWebBackgroundClassName() {
   useIsomorphicLayoutEffect(() => {
     // Adds the background color to the html element to prevent white background on overscroll.
