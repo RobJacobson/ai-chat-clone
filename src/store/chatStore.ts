@@ -36,56 +36,66 @@ type ChatStore = {
   clearAllData: () => Promise<void>;
 };
 
-export const useChatStore = create<ChatStore>()((set, get) => ({
-  chatHistory: [],
-  isWaitingForResponse: false,
+export const useChatStore = create<ChatStore>()(
+  persist(
+    (set, get) => ({
+      chatHistory: [],
+      isWaitingForResponse: false,
 
-  setIsWaitingForResponse: (isWaitingForResponse: boolean) => {
-    set({ isWaitingForResponse });
-  },
+      setIsWaitingForResponse: (isWaitingForResponse: boolean) => {
+        set({ isWaitingForResponse });
+      },
 
-  createNewChat: (message: string) => {
-    const newChat: Chat = {
-      id: generateId(),
-      title: message.slice(0, UI_CONSTANTS.CHAT_TITLE_MAX_LENGTH),
-      messages: [],
-      createdAt: Date.now(),
-    };
+      createNewChat: (message: string) => {
+        const newChat: Chat = {
+          id: generateId(),
+          title: message.slice(0, UI_CONSTANTS.CHAT_TITLE_MAX_LENGTH),
+          messages: [],
+          createdAt: Date.now(),
+        };
 
-    set((state) => ({
-      chatHistory: [newChat, ...state.chatHistory],
-    }));
+        set((state) => ({
+          chatHistory: [newChat, ...state.chatHistory].sort(
+            (a, b) => b.createdAt - a.createdAt
+          ),
+        }));
 
-    return newChat.id;
-  },
+        return newChat.id;
+      },
 
-  addNewMessage: (chatId, messageWithoutId) => {
-    const messageWithId: MessageType = {
-      ...messageWithoutId,
-      id: generateId(),
-    };
+      addNewMessage: (chatId, messageWithoutId) => {
+        const messageWithId: MessageType = {
+          ...messageWithoutId,
+          id: generateId(),
+        };
 
-    set((state) => ({
-      chatHistory: state.chatHistory.map((chat) =>
-        chat.id === chatId
-          ? { ...chat, messages: [...chat.messages, messageWithId] }
-          : chat
-      ),
-    }));
+        set((state) => ({
+          chatHistory: state.chatHistory.map((chat) =>
+            chat.id === chatId
+              ? { ...chat, messages: [...chat.messages, messageWithId] }
+              : chat
+          ),
+        }));
 
-    return messageWithId;
-  },
+        return messageWithId;
+      },
 
-  deleteChat: (chatId) => {
-    set((state) => ({
-      chatHistory: state.chatHistory.filter((chat) => chat.id !== chatId),
-    }));
-  },
+      deleteChat: (chatId) => {
+        set((state) => ({
+          chatHistory: state.chatHistory.filter((chat) => chat.id !== chatId),
+        }));
+      },
 
-  clearAllData: async () => {
-    // Clear the store state
-    set({ chatHistory: [], isWaitingForResponse: false });
-    // Clear AsyncStorage
-    await AsyncStorage.removeItem("chat-storage");
-  },
-}));
+      clearAllData: async () => {
+        // Clear the store state
+        set({ chatHistory: [], isWaitingForResponse: false });
+        // Clear AsyncStorage
+        await AsyncStorage.removeItem("chat-storage");
+      },
+    }),
+    {
+      name: "chat-storage",
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
