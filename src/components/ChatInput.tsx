@@ -1,4 +1,5 @@
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
   ImageBackground,
   KeyboardAvoidingView,
@@ -19,12 +20,14 @@ import { useChatOperations } from "~/hooks/useChatOperations";
 import { Button } from "./ui/button";
 
 interface ChatInputProps {
-  chatId: string | null;
+  chatId?: string;
 }
 
 const ChatInput = ({ chatId }: ChatInputProps) => {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
+
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   // Use hooks directly
   const { message, setMessage, clearMessage, hasMessage } = useChatMessage();
@@ -40,7 +43,7 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
   };
 
   const handleSend = async () => {
-    await sendMessage({ message, imageBase64, chatId });
+    await sendMessage({ message, imageBase64, chatId }, isGeneratingImage);
     clearInput();
   };
 
@@ -84,12 +87,21 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
           className="px-4 pt-6 pb-6 text-foreground"
           editable={!isWaitingForResponse}
         />
-        <View className="m-2 flex-row items-center justify-between">
+        <View className="m-2 flex-row items-center gap-4">
           <MaterialCommunityIcons
             name="plus"
             size={24}
             color={colors.foreground}
             onPress={pickImage}
+            disabled={isWaitingForResponse}
+          />
+          <MaterialCommunityIcons
+            name="palette"
+            size={24}
+            color={
+              isGeneratingImage ? colors.foreground : colors.mutedForeground
+            }
+            onPress={() => setIsGeneratingImage(!isGeneratingImage)}
             disabled={isWaitingForResponse}
           />
           {hasMessage ? (
@@ -99,10 +111,11 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
               color={colors.foreground}
               onPress={handleSend}
               disabled={isWaitingForResponse}
+              className="ml-auto"
             />
           ) : (
             <Button
-              className="flex flex-row gap-2 rounded-full"
+              className="ml-auto flex flex-row gap-2 rounded-full"
               size="sm"
               disabled={isWaitingForResponse}
             >

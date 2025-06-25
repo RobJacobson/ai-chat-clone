@@ -23,7 +23,7 @@ const HomeScreen = () => {
           <Text>Clear Storage (Debug)</Text>
         </Button>
       </View>
-      <ChatInput chatId={null} />
+      <ChatInput />
       <StatusBar style="auto" />
     </View>
   );

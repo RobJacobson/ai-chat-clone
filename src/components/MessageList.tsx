@@ -25,13 +25,11 @@ const MessageList = ({ messages }: MessageListProps) => {
       keyExtractor={(item) => item.id}
       removeClippedSubviews
       maxToRenderPerBatch={10}
-      // ListFooterComponent={() =>
-      //   isWaitingForResponse && (
-      //     <Text className="text-secondary-foreground">
-      //       Waiting for response...
-      //     </Text>
-      //   )
-      // }
+      ListFooterComponent={() =>
+        isWaitingForResponse && (
+          <Text className="p-6 text-gray-500">Waiting for response...</Text>
+        )
+      }
     />
   );
 };

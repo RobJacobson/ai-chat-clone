@@ -11,7 +11,7 @@ const generateId = () => `id-${++idCounter}-${Date.now()}`;
 export type MessageType = {
   id: string;
   role: "user" | "assistant";
-  message: string;
+  message?: string;
   image?: string;
   responseId?: string;
 };
@@ -38,7 +38,7 @@ type ChatStore = {
 
 export const useChatStore = create<ChatStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       chatHistory: [],
       isWaitingForResponse: false,
 
