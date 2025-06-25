@@ -1,10 +1,10 @@
 import { useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
 
-import ChatInput from "~/components/ChatInput";
-import MessageList from "~/components/MessageList";
-import { Text } from "~/components/ui/text";
-import { useChatStore } from "~/store/chatStore";
+import ChatInput from "@/components/ChatInput";
+import MessageList from "@/components/MessageList";
+import { Text } from "@/components/ui/text";
+import { useChatStore } from "@/store/chatStore";
 
 const ChatScreen = () => {
   const { id } = useLocalSearchParams();

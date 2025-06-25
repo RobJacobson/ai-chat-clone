@@ -1,6 +1,6 @@
 import { useColorScheme as useNativewindColorScheme } from "nativewind";
 
-import { NAV_THEME, THEME_COLORS } from "~/lib/constants";
+import { NAV_THEME, THEME_COLORS } from "@/lib/constants";
 
 export const useTheme = () => {
   const { colorScheme, setColorScheme, toggleColorScheme } =

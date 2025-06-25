@@ -2,6 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import { UI_CONSTANTS } from "@/lib/constants";
+
+// Utility function for generating unique IDs
+const generateId = () =>
+  `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
 export type MessageType = {
   id: string;
   role: "user" | "assistant";
@@ -14,6 +20,7 @@ export type Chat = {
   id: string;
   title: string;
   messages: MessageType[];
+  createdAt: number;
 };
 
 type ChatStore = {
@@ -23,21 +30,25 @@ type ChatStore = {
     chatId: string,
     message: Omit<MessageType, "id">
   ) => MessageType;
+  deleteChat: (chatId: string) => void;
 };
 
 export const useChatStore = create<ChatStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       chatHistory: [],
 
       createNewChat: (message: string) => {
         const newChat: Chat = {
-          id: Date.now().toString(),
-          title: message.slice(0, 50),
+          id: generateId(),
+          title: message.slice(0, UI_CONSTANTS.CHAT_TITLE_MAX_LENGTH),
           messages: [],
+          createdAt: Date.now(),
         };
 
-        set((state) => ({ chatHistory: [newChat, ...state.chatHistory] }));
+        set((state) => ({
+          chatHistory: [newChat, ...state.chatHistory],
+        }));
 
         return newChat.id;
       },
@@ -45,18 +56,24 @@ export const useChatStore = create<ChatStore>()(
       addNewMessage: (chatId, messageWithoutId) => {
         const messageWithId: MessageType = {
           ...messageWithoutId,
-          id: Date.now().toString(),
+          id: generateId(),
         };
 
         set((state) => ({
           chatHistory: state.chatHistory.map((chat) =>
             chat.id === chatId
-              ? { ...chat, messages: [...(chat.messages ?? []), messageWithId] }
+              ? { ...chat, messages: [...chat.messages, messageWithId] }
               : chat
           ),
         }));
 
         return messageWithId;
+      },
+
+      deleteChat: (chatId) => {
+        set((state) => ({
+          chatHistory: state.chatHistory.filter((chat) => chat.id !== chatId),
+        }));
       },
     }),
     {
@@ -64,9 +81,9 @@ export const useChatStore = create<ChatStore>()(
       storage: createJSONStorage(() => AsyncStorage),
       onRehydrateStorage: () => (state) => {
         if (state?.chatHistory) {
-          // Sort by numeric value of id (since id is a string)
+          // Sort by creation time (newest first)
           state.chatHistory = state.chatHistory.sort(
-            (a, b) => Number(b.id) - Number(a.id)
+            (a, b) => b.createdAt - a.createdAt
           );
         }
       },

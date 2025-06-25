@@ -1,5 +1,7 @@
 import OpenAI from "openai";
 
+import { UI_CONSTANTS } from "@/lib/constants";
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_SECRET_KEY,
 });
@@ -7,34 +9,38 @@ const openai = new OpenAI({
 export async function POST(request: Request) {
   const { message, image, previousResponseId } = await request.json();
 
-  const messageContent = image
-    ? [
-        { role: "user", content: message },
-        {
-          role: "user",
-          content: [
-            {
-              type: "input_image",
-              image_url: image,
-            },
-          ],
-        },
-      ]
-    : message;
+  // Build messages array for chat completion
+  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
+
+  if (image) {
+    messages.push({
+      role: "user",
+      content: [
+        { type: "text", text: message },
+        { type: "image_url", image_url: { url: image } },
+      ],
+    });
+  } else {
+    messages.push({ role: "user", content: message });
+  }
 
   try {
-    const response = await openai.responses.create({
-      model: "gpt-4.1",
-      input: messageContent,
-      ...(previousResponseId && { previous_response_id: previousResponseId }),
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // Using correct model name
+      messages,
+      max_tokens: UI_CONSTANTS.MAX_TOKENS,
     });
+
+    const responseMessage =
+      response.choices[0]?.message?.content ||
+      "Sorry, I couldn't generate a response.";
 
     return Response.json({
       responseId: response.id,
-      responseMessage: response.output_text,
+      responseMessage,
     });
   } catch (error) {
-    console.log(error);
+    console.error("OpenAI API error:", error);
     return Response.json(
       { error: "Failed to generate response" },
       { status: 500 }

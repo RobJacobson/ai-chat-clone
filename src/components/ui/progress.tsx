@@ -1,6 +1,14 @@
 import * as ProgressPrimitive from "@rn-primitives/progress";
+import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
+import { forwardRef } from "react";
 import { Platform, View } from "react-native";
+import {
+  type GestureStateChangeEvent,
+  type GestureTouchEvent,
+  TapGestureHandler,
+  type TapGestureHandlerEventPayload,
+} from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -9,7 +17,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-import { cn } from "~/lib/utils";
+import { cn } from "@/lib/utils";
 
 function Progress({
   className,
@@ -62,9 +70,7 @@ function Indicator({
         )}
         style={{ transform: `translateX(-${100 - (value ?? 0)}%)` }}
       >
-        <ProgressPrimitive.Indicator
-          className={cn("h-full w-full", className)}
-        />
+        <ProgressPrimitive.Indicator className={cn("h-full w-full", className)} />
       </View>
     );
   }

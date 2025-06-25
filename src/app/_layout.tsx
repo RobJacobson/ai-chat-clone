@@ -14,10 +14,10 @@ import * as React from "react";
 import { Appearance, Platform, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import HistoryChatsDrawer from "~/components/HistoryChatsDrawer";
-import { ThemeToggle } from "~/components/ThemeToggle";
-import { useTheme } from "~/hooks/useTheme";
-import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
+import HistoryChatsDrawer from "@/components/HistoryChatsDrawer";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { useTheme } from "@/hooks/useTheme";
+import { setAndroidNavigationBar } from "@/lib/android-navigation-bar";
 
 // Theme objects will be created dynamically using the useTheme hook
 

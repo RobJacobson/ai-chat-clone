@@ -1,7 +1,8 @@
 import * as AvatarPrimitive from "@rn-primitives/avatar";
 import type * as React from "react";
+import { Text } from "react-native";
 
-import { cn } from "~/lib/utils";
+import { cn } from "@/lib/utils";
 
 function Avatar({
   className,

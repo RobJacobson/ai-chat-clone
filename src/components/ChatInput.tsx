@@ -12,27 +12,47 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useChatAPI } from "~/hooks/useChatAPI";
-import { useTheme } from "~/hooks/useTheme";
-import { useChatStore } from "~/store/chatStore";
+import { useChatAPI } from "@/hooks/useChatAPI";
+import { useTheme } from "@/hooks/useTheme";
+import { UI_CONSTANTS } from "@/lib/constants";
+import { useChatStore } from "@/store/chatStore";
 
 import { Button } from "./ui/button";
 
-const ChatInput = ({ chatId }: { chatId: string | null }) => {
+interface ChatInputProps {
+  chatId: string | null;
+}
+
+const ChatInput = ({ chatId }: ChatInputProps) => {
   const insets = useSafeAreaInsets();
   const [message, setMessage] = useState("");
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const { colors } = useTheme();
 
-  // Optimized selectors - only re-render when these specific values change
-  const addNewMessage = useChatStore((state) => state.addNewMessage);
-  const createNewChat = useChatStore((state) => state.createNewChat);
-  const chatHistory = useChatStore((state) => state.chatHistory);
+  // Optimized selectors
+  const { addNewMessage, createNewChat, chatHistory } = useChatStore(
+    (state) => ({
+      addNewMessage: state.addNewMessage,
+      createNewChat: state.createNewChat,
+      chatHistory: state.chatHistory,
+    })
+  );
 
-  const { sendUserMessage } = useChatAPI();
+  const { sendUserMessage, isLoading } = useChatAPI();
+
+  const clearInput = () => {
+    setMessage("");
+    setImageBase64(null);
+  };
+
+  const getPreviousResponseId = (currentChatId: string): string | null => {
+    const chat = chatHistory.find((chat) => chat.id === currentChatId);
+    const previousResponse = chat?.messages.at(-1);
+    return previousResponse?.responseId ?? null;
+  };
 
   const handleSend = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() || isLoading) return;
 
     try {
       const currentChatId = !chatId ? createNewChat(message) : chatId;
@@ -44,43 +64,51 @@ const ChatInput = ({ chatId }: { chatId: string | null }) => {
         ...(imageBase64 && { image: imageBase64 }),
       });
 
-      // Clear input immediately
-      setMessage("");
-      setImageBase64(null);
+      // Clear input immediately for better UX
+      clearInput();
 
       // Navigate to chat if it's a new chat
       if (!chatId) {
         router.push(`/chat/${currentChatId}`);
       }
 
-      // Get previous response ID for context
-      const chat = chatHistory.find((chat) => chat.id === currentChatId);
-      const previousResponse = chat?.messages.at(-1);
-      const previousResponseId = previousResponse?.responseId ?? null;
+      const previousResponseId = getPreviousResponseId(currentChatId);
 
-      // Send message to API (this will also add the AI response to state)
+      // Send message to API
       await sendUserMessage(currentChatId, userMessage, previousResponseId);
     } catch (error) {
-      console.log("Error sending message:", error);
+      console.error("Error sending message:", error);
+      // Could add toast notification here
     }
   };
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      base64: true,
-      quality: 1,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        base64: true,
+        quality: 0.8, // Reduce quality for better performance
+        allowsEditing: true,
+      });
 
-    if (!result.canceled && result.assets[0].base64) {
-      setImageBase64(`data:image/jpeg;base64,${result.assets[0].base64}`);
+      if (!result.canceled && result.assets[0].base64) {
+        setImageBase64(`data:image/jpeg;base64,${result.assets[0].base64}`);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
     }
   };
+
+  const keyboardVerticalOffset = Platform.select({
+    ios: UI_CONSTANTS.KEYBOARD_OFFSET_IOS,
+    android: UI_CONSTANTS.KEYBOARD_OFFSET_ANDROID,
+    default: 0,
+  });
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 65 : 20}
+      keyboardVerticalOffset={keyboardVerticalOffset}
       className="w-full"
     >
       <View
@@ -91,7 +119,7 @@ const ChatInput = ({ chatId }: { chatId: string | null }) => {
           <ImageBackground
             source={{ uri: imageBase64 }}
             className="mx-3 mt-2 h-16 w-16"
-            imageClassName="rounded-xl;"
+            imageClassName="rounded-xl"
           >
             <AntDesign
               name="closecircle"
@@ -105,10 +133,11 @@ const ChatInput = ({ chatId }: { chatId: string | null }) => {
         <TextInput
           value={message}
           onChangeText={setMessage}
-          placeholder="Ask anything..."
+          placeholder={UI_CONSTANTS.MESSAGE_INPUT_PLACEHOLDER}
           placeholderTextColor="gray"
           multiline
           className="px-4 pt-6 pb-6 text-foreground"
+          editable={!isLoading}
         />
         <View className="m-2 flex-row items-center justify-between">
           <MaterialCommunityIcons
@@ -116,17 +145,22 @@ const ChatInput = ({ chatId }: { chatId: string | null }) => {
             size={24}
             color={colors.foreground}
             onPress={pickImage}
+            disabled={isLoading}
           />
           {message ? (
             <MaterialCommunityIcons
-              name="arrow-up-circle"
+              name={isLoading ? "loading" : "arrow-up-circle"}
               size={30}
               color={colors.foreground}
-              className=""
               onPress={handleSend}
+              disabled={isLoading}
             />
           ) : (
-            <Button className="flex flex-row gap-2 rounded-full" size="sm">
+            <Button
+              className="flex flex-row gap-2 rounded-full"
+              size="sm"
+              disabled={isLoading}
+            >
               <MaterialCommunityIcons
                 name="account-voice"
                 size={15}

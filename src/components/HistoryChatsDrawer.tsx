@@ -7,7 +7,7 @@ import {
 } from "@react-navigation/drawer";
 import { router, usePathname } from "expo-router";
 
-import { useChatStore } from "~/store/chatStore";
+import { useChatStore } from "@/store/chatStore";
 
 const HistoryChatsDrawer = (props: DrawerContentComponentProps) => {
   const pathname = usePathname();

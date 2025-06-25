@@ -1,8 +1,10 @@
 import * as Slot from "@rn-primitives/slot";
+import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
+import { createContext, forwardRef, useContext } from "react";
 import { Text as RNText } from "react-native";
 
-import { cn } from "~/lib/utils";
+import { cn } from "@/lib/utils";
 
 const TextClassContext = React.createContext<string | undefined>(undefined);
 

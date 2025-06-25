@@ -35,3 +35,13 @@ export const THEME_COLORS = {
     accentForeground: "hsl(0 0% 98%)",
   },
 };
+
+export const UI_CONSTANTS = {
+  CHAT_TITLE_MAX_LENGTH: 50,
+  IMAGE_SIZE: 160,
+  KEYBOARD_OFFSET_IOS: 65,
+  KEYBOARD_OFFSET_ANDROID: 20,
+  SCROLL_DELAY: 100,
+  MESSAGE_INPUT_PLACEHOLDER: "Ask anything...",
+  MAX_TOKENS: 1000,
+} as const;

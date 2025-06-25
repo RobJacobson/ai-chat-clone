@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { type MessageType, useChatStore } from "~/store/chatStore";
+import { type MessageType, useChatStore } from "@/store/chatStore";
 
 export const useChatAPI = () => {
   const [isLoading, setIsLoading] = useState(false);

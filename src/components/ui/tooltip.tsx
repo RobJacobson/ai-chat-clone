@@ -1,10 +1,12 @@
 import * as TooltipPrimitive from "@rn-primitives/tooltip";
+import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
-import { Platform, StyleSheet } from "react-native";
+import { forwardRef } from "react";
+import { Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { TextClassContext } from "~/components/ui/text";
-import { cn } from "~/lib/utils";
+import { TextClassContext } from "@/components/ui/text";
+import { cn } from "@/lib/utils";
 
 const Tooltip = TooltipPrimitive.Root;
 
