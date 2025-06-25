@@ -1,4 +1,5 @@
 import { useColorScheme as useNativewindColorScheme } from "nativewind";
+import { useMemo } from "react";
 
 import { NAV_THEME, THEME_COLORS } from "@/lib/constants";
 
@@ -10,13 +11,24 @@ export const useTheme = () => {
 
   const themeKey = isDarkColorScheme ? "dark" : "light";
 
-  const colors = {
-    // Navigation theme colors from constants
-    navigation: NAV_THEME[themeKey],
+  const colors = useMemo(
+    () => ({
+      // Navigation theme colors from constants
+      navigation: NAV_THEME[themeKey],
 
-    // Component theme colors from constants
-    ...THEME_COLORS[themeKey],
-  };
+      // Component theme colors from constants
+      ...THEME_COLORS[themeKey],
+    }),
+    [themeKey]
+  );
+
+  const navigationTheme = useMemo(
+    () => ({
+      dark: isDarkColorScheme,
+      colors: colors.navigation,
+    }),
+    [isDarkColorScheme, colors.navigation]
+  );
 
   return {
     isDarkColorScheme,
@@ -24,10 +36,6 @@ export const useTheme = () => {
     setColorScheme,
     toggleColorScheme,
     colors,
-    // Navigation theme object for react-navigation
-    navigationTheme: {
-      dark: isDarkColorScheme,
-      colors: colors.navigation,
-    },
+    navigationTheme,
   };
 };

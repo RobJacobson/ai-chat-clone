@@ -9,9 +9,12 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useChatInputController } from "@/hooks/useChatInputController";
+import { useChatMessage } from "@/hooks/useChatMessage";
+import { useImagePicker } from "@/hooks/useImagePicker";
 import { useTheme } from "@/hooks/useTheme";
 import { UI_CONSTANTS } from "@/lib/constants";
+import { useChatStore } from "@/store/chatStore";
+import { useChatOperations } from "~/hooks/useChatOperations";
 
 import { Button } from "./ui/button";
 
@@ -23,17 +26,23 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
 
-  const {
-    message,
-    setMessage,
-    hasMessage,
-    imageBase64,
-    pickImage,
-    clearImage,
-    handleSend,
-    isLoading,
-    error,
-  } = useChatInputController({ chatId });
+  // Use hooks directly
+  const { message, setMessage, clearMessage, hasMessage } = useChatMessage();
+  const { imageBase64, pickImage, clearImage } = useImagePicker();
+  const { sendMessage } = useChatOperations();
+  const isWaitingForResponse = useChatStore(
+    (state) => state.isWaitingForResponse
+  );
+
+  const clearInput = () => {
+    clearMessage();
+    clearImage();
+  };
+
+  const handleSend = async () => {
+    await sendMessage({ message, imageBase64, chatId });
+    clearInput();
+  };
 
   const keyboardVerticalOffset = Platform.select({
     ios: UI_CONSTANTS.KEYBOARD_OFFSET_IOS,
@@ -51,11 +60,6 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
         className="m-0 w-full rounded-t-3xl bg-muted"
         style={{ paddingBottom: insets.bottom }}
       >
-        {error && (
-          <View className="mx-3 mt-2 rounded-md bg-red-100 p-2">
-            <Text className="text-red-800 text-sm">{error}</Text>
-          </View>
-        )}
         {imageBase64 && (
           <ImageBackground
             source={{ uri: imageBase64 }}
@@ -78,7 +82,7 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
           placeholderTextColor="gray"
           multiline
           className="px-4 pt-6 pb-6 text-foreground"
-          editable={!isLoading}
+          editable={!isWaitingForResponse}
         />
         <View className="m-2 flex-row items-center justify-between">
           <MaterialCommunityIcons
@@ -86,21 +90,21 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
             size={24}
             color={colors.foreground}
             onPress={pickImage}
-            disabled={isLoading}
+            disabled={isWaitingForResponse}
           />
           {hasMessage ? (
             <MaterialCommunityIcons
-              name={isLoading ? "loading" : "arrow-up-circle"}
+              name={isWaitingForResponse ? "loading" : "arrow-up-circle"}
               size={30}
               color={colors.foreground}
               onPress={handleSend}
-              disabled={isLoading}
+              disabled={isWaitingForResponse}
             />
           ) : (
             <Button
               className="flex flex-row gap-2 rounded-full"
               size="sm"
-              disabled={isLoading}
+              disabled={isWaitingForResponse}
             >
               <MaterialCommunityIcons
                 name="account-voice"

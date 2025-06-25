@@ -1,6 +1,5 @@
 import { router } from "expo-router";
 
-import { useChatAPI } from "@/hooks/useChatAPI";
 import { useChatStore } from "@/store/chatStore";
 
 export interface SendMessageParams {
@@ -9,79 +8,72 @@ export interface SendMessageParams {
   chatId?: string | null;
 }
 
-export interface ChatOperationResult {
-  success: boolean;
-  chatId?: string;
-  error?: string;
-}
-
 export const useChatOperations = () => {
-  const { addNewMessage, createNewChat, chatHistory } = useChatStore(
-    (state) => ({
-      addNewMessage: state.addNewMessage,
-      createNewChat: state.createNewChat,
-      chatHistory: state.chatHistory,
-    })
+  const setIsWaitingForResponse = useChatStore(
+    (state) => state.setIsWaitingForResponse
   );
+  const addNewMessage = useChatStore((state) => state.addNewMessage);
+  const createNewChat = useChatStore((state) => state.createNewChat);
+  const chatHistory = useChatStore((state) => state.chatHistory);
 
-  const { sendUserMessage, isLoading, error: apiError, clearError: clearApiError } = useChatAPI();
-
-  const getPreviousResponseId = (chatId: string): string | null => {
-    const chat = chatHistory.find((chat) => chat.id === chatId);
-    const previousResponse = chat?.messages.at(-1);
-    return previousResponse?.responseId ?? null;
-  };
+  const getPreviousResponseId = (chatId: string) =>
+    chatHistory.find((chat) => chat.id === chatId)?.messages.at(-1)?.responseId;
 
   const sendMessage = async ({
     message,
     imageBase64,
     chatId,
-  }: SendMessageParams): Promise<ChatOperationResult> => {
-    if (!message.trim()) {
-      return { success: false, error: "Message cannot be empty" };
+  }: SendMessageParams) => {
+    setIsWaitingForResponse(true);
+
+    // Create new chat and navigate to it if needed
+    const currentChatId = chatId || createNewChat(message);
+    if (!chatId) {
+      router.push(`/chat/${currentChatId}`);
     }
 
-    if (isLoading) {
-      return { success: false, error: "Another message is being sent" };
-    }
+    // Add user message to state
+    addNewMessage(currentChatId, {
+      role: "user",
+      message,
+      ...(imageBase64 && { image: imageBase64 }),
+    });
+
+    const previousResponseId = getPreviousResponseId(currentChatId);
 
     try {
-      // Create new chat if needed
-      const currentChatId = chatId || createNewChat(message);
-
-      // Add user message to state immediately
-      const userMessage = addNewMessage(currentChatId, {
-        role: "user",
-        message,
-        ...(imageBase64 && { image: imageBase64 }),
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: message,
+          image: imageBase64,
+          previousResponseId,
+        }),
       });
 
-      const previousResponseId = getPreviousResponseId(currentChatId);
+      const data = await response.json();
+      console.log("data", data);
 
-      // Send message to API
-      await sendUserMessage(currentChatId, userMessage, previousResponseId);
+      if (!response.ok) {
+        throw new Error(data.error);
+      }
 
-      return { success: true, chatId: currentChatId };
+      // Add AI response to state
+      addNewMessage(currentChatId, {
+        role: "assistant",
+        message: data.responseMessage,
+        responseId: data.responseId,
+      });
     } catch (error) {
-      console.error("Error sending message:", error);
-      return {
-        success: false,
-        error:
-          error instanceof Error ? error.message : "Failed to send message",
-      };
+      console.error("Chat error:", error);
+      throw error;
+    } finally {
+      setIsWaitingForResponse(false);
     }
-  };
-
-  const navigateToChat = (chatId: string) => {
-    router.push(`/chat/${chatId}`);
   };
 
   return {
     sendMessage,
-    navigateToChat,
-    isLoading,
-    error: apiError,
-    clearError: clearApiError,
-    getPreviousResponseId,
   };
 };

@@ -83,16 +83,6 @@ export default function RootLayout() {
   );
 }
 
-// <Stack>
-//   <Stack.Screen
-//     name="index"
-//     options={{
-//       title: "Starter Base",
-//       headerRight: () => <ThemeToggle />,
-//     }}
-//   />
-// </Stack>;
-
 const useIsomorphicLayoutEffect =
   Platform.OS === "web" && typeof window === "undefined"
     ? React.useEffect

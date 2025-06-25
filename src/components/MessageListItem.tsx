@@ -1,4 +1,3 @@
-import { memo } from "react";
 import { Image, View } from "react-native";
 import Markdown from "react-native-markdown-display";
 
@@ -11,7 +10,7 @@ interface MessageListItemProps {
   messageItem: MessageType;
 }
 
-const MessageListItem = memo(({ messageItem }: MessageListItemProps) => {
+const MessageListItem = ({ messageItem }: MessageListItemProps) => {
   const { message, role, image } = messageItem;
   const isUser = role === "user";
   const { markdownStyles } = useMarkdownStyles();
@@ -19,14 +18,13 @@ const MessageListItem = memo(({ messageItem }: MessageListItemProps) => {
   return (
     <View className={cn("mb-3 px-2", isUser && "items-end")}>
       {image && (
-        <Image 
-          source={{ uri: image }} 
-          className="mb-2 rounded-lg" 
-          style={{ 
-            width: UI_CONSTANTS.IMAGE_SIZE, 
-            height: UI_CONSTANTS.IMAGE_SIZE, 
-            borderRadius: 8 
-          }} 
+        <Image
+          source={{ uri: image }}
+          className="mb-2 rounded-lg"
+          style={{
+            width: UI_CONSTANTS.IMAGE_SIZE,
+            height: UI_CONSTANTS.IMAGE_SIZE,
+          }}
           resizeMode="cover"
         />
       )}
@@ -40,8 +38,6 @@ const MessageListItem = memo(({ messageItem }: MessageListItemProps) => {
       </View>
     </View>
   );
-});
-
-MessageListItem.displayName = "MessageListItem";
+};
 
 export default MessageListItem;

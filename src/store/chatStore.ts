@@ -5,8 +5,8 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { UI_CONSTANTS } from "@/lib/constants";
 
 // Utility function for generating unique IDs
-const generateId = () =>
-  `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+let idCounter = 0;
+const generateId = () => `id-${++idCounter}-${Date.now()}`;
 
 export type MessageType = {
   id: string;
@@ -25,68 +25,67 @@ export type Chat = {
 
 type ChatStore = {
   chatHistory: Chat[];
+  isWaitingForResponse: boolean;
+  setIsWaitingForResponse: (isWaiting: boolean) => void;
   createNewChat: (title: string) => string;
   addNewMessage: (
     chatId: string,
     message: Omit<MessageType, "id">
   ) => MessageType;
   deleteChat: (chatId: string) => void;
+  clearAllData: () => Promise<void>;
 };
 
-export const useChatStore = create<ChatStore>()(
-  persist(
-    (set, get) => ({
-      chatHistory: [],
+export const useChatStore = create<ChatStore>()((set, get) => ({
+  chatHistory: [],
+  isWaitingForResponse: false,
 
-      createNewChat: (message: string) => {
-        const newChat: Chat = {
-          id: generateId(),
-          title: message.slice(0, UI_CONSTANTS.CHAT_TITLE_MAX_LENGTH),
-          messages: [],
-          createdAt: Date.now(),
-        };
+  setIsWaitingForResponse: (isWaitingForResponse: boolean) => {
+    set({ isWaitingForResponse });
+  },
 
-        set((state) => ({
-          chatHistory: [newChat, ...state.chatHistory],
-        }));
+  createNewChat: (message: string) => {
+    const newChat: Chat = {
+      id: generateId(),
+      title: message.slice(0, UI_CONSTANTS.CHAT_TITLE_MAX_LENGTH),
+      messages: [],
+      createdAt: Date.now(),
+    };
 
-        return newChat.id;
-      },
+    set((state) => ({
+      chatHistory: [newChat, ...state.chatHistory],
+    }));
 
-      addNewMessage: (chatId, messageWithoutId) => {
-        const messageWithId: MessageType = {
-          ...messageWithoutId,
-          id: generateId(),
-        };
+    return newChat.id;
+  },
 
-        set((state) => ({
-          chatHistory: state.chatHistory.map((chat) =>
-            chat.id === chatId
-              ? { ...chat, messages: [...chat.messages, messageWithId] }
-              : chat
-          ),
-        }));
+  addNewMessage: (chatId, messageWithoutId) => {
+    const messageWithId: MessageType = {
+      ...messageWithoutId,
+      id: generateId(),
+    };
 
-        return messageWithId;
-      },
+    set((state) => ({
+      chatHistory: state.chatHistory.map((chat) =>
+        chat.id === chatId
+          ? { ...chat, messages: [...chat.messages, messageWithId] }
+          : chat
+      ),
+    }));
 
-      deleteChat: (chatId) => {
-        set((state) => ({
-          chatHistory: state.chatHistory.filter((chat) => chat.id !== chatId),
-        }));
-      },
-    }),
-    {
-      name: "chat-storage",
-      storage: createJSONStorage(() => AsyncStorage),
-      onRehydrateStorage: () => (state) => {
-        if (state?.chatHistory) {
-          // Sort by creation time (newest first)
-          state.chatHistory = state.chatHistory.sort(
-            (a, b) => b.createdAt - a.createdAt
-          );
-        }
-      },
-    }
-  )
-);
+    return messageWithId;
+  },
+
+  deleteChat: (chatId) => {
+    set((state) => ({
+      chatHistory: state.chatHistory.filter((chat) => chat.id !== chatId),
+    }));
+  },
+
+  clearAllData: async () => {
+    // Clear the store state
+    set({ chatHistory: [], isWaitingForResponse: false });
+    // Clear AsyncStorage
+    await AsyncStorage.removeItem("chat-storage");
+  },
+}));

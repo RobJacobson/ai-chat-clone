@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const useChatInput = () => {
+export const useChatMessage = () => {
   const [message, setMessage] = useState("");
 
   const clearMessage = () => {
@@ -15,4 +15,4 @@ export const useChatInput = () => {
     clearMessage,
     hasMessage,
   };
-}; 
+};
