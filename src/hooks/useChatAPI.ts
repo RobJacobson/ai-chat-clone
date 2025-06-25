@@ -4,6 +4,7 @@ import { type MessageType, useChatStore } from "@/store/chatStore";
 
 export const useChatAPI = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const addNewMessage = useChatStore((state) => state.addNewMessage);
 
   const sendUserMessage = async (
@@ -12,6 +13,7 @@ export const useChatAPI = () => {
     previousResponseId?: string | null
   ) => {
     setIsLoading(true);
+    setError(null);
 
     try {
       const response = await fetch("/api/chat", {
@@ -39,14 +41,20 @@ export const useChatAPI = () => {
       });
     } catch (error) {
       console.error("Chat error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to send message";
+      setError(errorMessage);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
+  const clearError = () => setError(null);
+
   return {
     sendUserMessage,
     isLoading,
+    error,
+    clearError,
   };
 };
