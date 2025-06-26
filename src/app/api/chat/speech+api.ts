@@ -22,6 +22,7 @@ const openai = new OpenAI({
 });
 
 export async function POST(request: Request) {
+  console.log("LOCALLLLLLLL");
   const { audioBase64, previousResponseId } = await request.json();
 
   try {

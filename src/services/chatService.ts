@@ -21,7 +21,7 @@ export const getTextResponse = async (
   previousResponseId?: string
 ) => {
   console.log("imageBase64", imageBase64?.slice(0, 50));
-  const res = await fetch("/api/chat", {
+  const res = await fetch("https://ai-chat-clone.expo.app/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message, image: imageBase64, previousResponseId }),
@@ -41,7 +41,7 @@ export const getSpeechResponse = async (
   audioBase64: string,
   previousResponseId?: string
 ) => {
-  const res = await fetch("/api/chat/speech", {
+  const res = await fetch("https://ai-chat-clone.expo.app/api/chat/speech", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ audioBase64, previousResponseId }),

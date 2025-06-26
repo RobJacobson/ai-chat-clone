@@ -13,9 +13,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -23,7 +21,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -34,13 +36,21 @@
       [
         "expo-router",
         {
-          "origin": "https://192.168.12.124:8081"
+          "origin": "https://ai-chat-clone.expo.app"
         }
       ],
       "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://ai-chat-clone.expo.app"
+      },
+      "eas": {
+        "projectId": "06910214-b27d-4c98-8789-19c3a1790a8a"
+      }
     }
   }
 }
