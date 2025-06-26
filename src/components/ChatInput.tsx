@@ -1,4 +1,6 @@
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { AudioModule, RecordingPresets, useAudioRecorder } from "expo-audio";
+import * as FileSystem from "expo-file-system";
 import { useState } from "react";
 import {
   ImageBackground,
@@ -11,11 +13,11 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useChatMessage } from "@/hooks/useChatMessage";
+import { useChatOperations } from "@/hooks/useChatOperations";
 import { useImagePicker } from "@/hooks/useImagePicker";
 import { useTheme } from "@/hooks/useTheme";
 import { UI_CONSTANTS } from "@/lib/constants";
 import { useChatStore } from "@/store/chatStore";
-import { useChatOperations } from "~/hooks/useChatOperations";
 
 import { Button } from "./ui/button";
 
@@ -37,13 +39,67 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
     (state) => state.isWaitingForResponse
   );
 
+  // Speech recognition
+  const audioRecorder = useAudioRecorder({
+    ...RecordingPresets.HighQuality,
+    extension: ".m4a",
+  });
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedAudioPath, setRecordedAudioPath] = useState<string | null>(
+    null
+  );
+
+  // Speech recognition functions
+  const startRecording = async () => {
+    try {
+      const { granted } = await AudioModule.requestRecordingPermissionsAsync();
+      if (!granted) {
+        throw new Error("Permission to record audio was denied");
+      }
+      await audioRecorder.prepareToRecordAsync(RecordingPresets.HighQuality);
+      await audioRecorder.record();
+      setIsRecording(true);
+    } catch (error) {
+      console.error("Error starting recording:", error);
+    }
+  };
+
+  const stopRecording = async () => {
+    try {
+      await audioRecorder.stop();
+      if (audioRecorder?.uri) {
+        setRecordedAudioPath(audioRecorder.uri);
+      }
+      setIsRecording(false);
+      console.log(recordedAudioPath);
+    } catch (error) {
+      console.error("Error stopping recording:", error);
+    }
+  };
+
+  const handleCovertAudiio = async () => {
+    if (!recordedAudioPath) return null;
+
+    return FileSystem.readAsStringAsync(recordedAudioPath, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+  };
+
   const clearInput = () => {
     clearMessage();
     clearImage();
+    setRecordedAudioPath(null);
   };
 
   const handleSend = async () => {
-    await sendMessage({ message, imageBase64, chatId }, isGeneratingImage);
+    const audioBase64 = await handleCovertAudiio();
+    await sendMessage({
+      chatId,
+      message,
+      imageBase64,
+      audioBase64,
+      isGeneratingImage,
+    });
     clearInput();
   };
 
@@ -104,7 +160,7 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
             onPress={() => setIsGeneratingImage(!isGeneratingImage)}
             disabled={isWaitingForResponse}
           />
-          {hasMessage ? (
+          {hasMessage || recordedAudioPath ? (
             <MaterialCommunityIcons
               name={isWaitingForResponse ? "loading" : "arrow-up-circle"}
               size={30}
@@ -118,13 +174,16 @@ const ChatInput = ({ chatId }: ChatInputProps) => {
               className="ml-auto flex flex-row gap-2 rounded-full"
               size="sm"
               disabled={isWaitingForResponse}
+              onPress={isRecording ? stopRecording : startRecording}
             >
               <MaterialCommunityIcons
                 name="account-voice"
                 size={15}
                 color={colors.primaryForeground}
               />
-              <Text className="text-primary-foreground text-sm">Voice</Text>
+              <Text className="text-primary-foreground text-sm">
+                {isRecording ? "Recording..." : "Voice"}
+              </Text>
             </Button>
           )}
         </View>

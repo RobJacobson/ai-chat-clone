@@ -30,7 +30,8 @@
     "index.js",
     "tsconfig.json",
     ".env",
-    ".gitignore"
+    ".gitignore",
+    "biome.json"
   ],
   // Biome formatter configuration
   "editor.formatOnSave": true,

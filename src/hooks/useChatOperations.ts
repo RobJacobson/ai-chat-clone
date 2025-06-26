@@ -1,13 +1,27 @@
 import { router } from "expo-router";
 
-import { createAIImage, getTextResponse } from "@/services/chatService";
+import {
+  createAIImage,
+  getSpeechResponse,
+  getTextResponse,
+} from "@/services/chatService";
 import { useChatStore } from "@/store/chatStore";
 
 export interface SendMessageParams {
+  chatId?: string;
   message: string;
   imageBase64: string | null;
-  chatId?: string | null;
+  audioBase64: string | null;
+  isGeneratingImage: boolean;
 }
+
+type APIResponse =
+  | { image: string }
+  | {
+      responseMessage: string;
+      responseId: string;
+      transcribedMessage?: string;
+    };
 
 export const useChatOperations = () => {
   const setIsWaitingForResponse = useChatStore(
@@ -20,10 +34,13 @@ export const useChatOperations = () => {
   const getPreviousResponseId = (chatId: string) =>
     chatHistory.find((chat) => chat.id === chatId)?.messages.at(-1)?.responseId;
 
-  const sendMessage = async (
-    { message, imageBase64, chatId }: SendMessageParams,
-    isGeneratingImage: boolean
-  ) => {
+  const sendMessage = async ({
+    chatId,
+    message,
+    imageBase64,
+    audioBase64,
+    isGeneratingImage,
+  }: SendMessageParams) => {
     setIsWaitingForResponse(true);
 
     // Create new chat and navigate to it if needed
@@ -37,29 +54,36 @@ export const useChatOperations = () => {
       role: "user",
       message,
       ...(imageBase64 && { image: imageBase64 }),
+      ...(audioBase64 && { audio: audioBase64 }),
     });
 
     const previousResponseId = getPreviousResponseId(currentChatId);
 
     try {
-      const data = isGeneratingImage
-        ? await createAIImage(message)
-        : await getTextResponse(message, imageBase64, previousResponseId);
+      const data = await fetchResponse(
+        message,
+        imageBase64,
+        audioBase64,
+        isGeneratingImage,
+        previousResponseId
+      );
 
-      const aiResponseMessage = isGeneratingImage
-        ? {
-            id: Date.now().toString(),
-            role: "assistant" as const,
-            image: data.image,
-          }
-        : {
-            id: Date.now().toString(),
-            role: "assistant" as const,
-            message: data.responseMessage,
-            responseId: data.responseId,
-          };
+      const aiResponseMessage = createResponseMessage(
+        data,
+        isGeneratingImage,
+        audioBase64
+      );
 
       // Add AI response to state
+
+      if (audioBase64) {
+        const userMessage = {
+          role: "user",
+          message: data.transcribedMessage,
+        } as const;
+        addNewMessage(currentChatId, userMessage);
+      }
+
       addNewMessage(currentChatId, aiResponseMessage);
     } catch (error) {
       console.error("Chat error:", error);
@@ -71,5 +95,46 @@ export const useChatOperations = () => {
 
   return {
     sendMessage,
+  };
+};
+
+const fetchResponse = async (
+  message: string,
+  imageBase64: string | null,
+  audioBase64: string | null,
+  isGeneratingImage: boolean,
+  previousResponseId?: string
+) => {
+  if (isGeneratingImage) return createAIImage(message);
+  if (audioBase64) return getSpeechResponse(audioBase64, previousResponseId);
+  return getTextResponse(message, imageBase64, previousResponseId);
+};
+
+const createResponseMessage = (
+  data: APIResponse,
+  isGeneratingImage: boolean,
+  audioBase64: string | null
+) => {
+  if (isGeneratingImage) {
+    const imageData = data as { image: string };
+    return { role: "assistant" as const, image: imageData.image };
+  }
+  const textData = data as {
+    responseMessage: string;
+    responseId: string;
+    transcribedMessage?: string;
+  };
+  if (audioBase64) {
+    return {
+      role: "assistant" as const,
+      message: textData.responseMessage,
+      responseId: textData.responseId,
+      transcribedMessage: textData.transcribedMessage,
+    };
+  }
+  return {
+    role: "assistant" as const,
+    message: textData.responseMessage,
+    responseId: textData.responseId,
   };
 };
